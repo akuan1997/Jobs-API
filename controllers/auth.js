@@ -1,7 +1,6 @@
 const User = require('../models/user');
 const {StatusCodes} = require('http-status-codes')
 // const bcrypt = require('bcryptjs') // 移動到models/Users.js裡面
-const jwt = require('jsonwebtoken')
 
 const register = async (req, res) => {
     // const { name, email, password } = req.body;
@@ -16,12 +15,10 @@ const register = async (req, res) => {
     // 來自 http-status-codes 模組，等同於 201 (表示資源已成功創建)。
     // .json({ user })：將剛剛創建的用戶物件 user 轉成 JSON 格式並發送回客戶端。
     const user = await User.create({...req.body})
-    const token = jwt.sign({userID: user._id, name: user.name}, 'jwtSecret', {
-        expiresIn: '30d',
-    })
+    const token = user.createJWT()
     res
         .status(StatusCodes.CREATED)
-        .json({user: {name: user.getName()}, token})
+        .json({user: {name: user.name}, token})
 }
 
 const login = async (req, res) => {
